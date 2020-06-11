@@ -74,3 +74,7 @@ class RetryWithFixedDelayStrategy(RetryStrategy):
     def post_retry(self):
         time.sleep(self._delay)
         super().post_retry()
+
+
+class RetryWithVariableDelay(RetryStrategy):
+    pass

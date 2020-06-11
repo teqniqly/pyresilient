@@ -58,9 +58,9 @@ class RetryWithFixedDelayStrategy(TestCase):
         tc = TestClass(3)
 
         # Act
-        start_time = time.time()
+        start_time = time.perf_counter()
         result = tc.execute_retry_with_delay(10)
-        end_time = time.time() - start_time
+        end_time = time.perf_counter() - start_time
 
         # Assert
         self.assertEqual(3, tc.retry_count)
