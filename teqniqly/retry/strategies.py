@@ -7,7 +7,7 @@ from logging import Logger
 # noinspection PyBroadException
 class RetryStrategyBase(ABC):
     @abstractmethod
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger = None):
         self._logger = logger
         self._retry_args = []
         self._retry_kwargs = {}
@@ -45,7 +45,7 @@ class RetryStrategyBase(ABC):
 
 
 class RetryStrategy(RetryStrategyBase):
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger = None):
         super().__init__(logger=logger)
         self._max_retries = None
 
@@ -59,7 +59,7 @@ class RetryStrategy(RetryStrategyBase):
 
 
 class RetryWithFixedDelayStrategy(RetryStrategy):
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger = None):
         super().__init__(logger)
         self._delay = None
 

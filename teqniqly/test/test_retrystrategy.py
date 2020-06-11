@@ -1,12 +1,10 @@
 import time
-from logging import Logger
 from unittest import TestCase
 
 from teqniqly.retry.strategies import RetryStrategy, RetryWithFixedDelayStrategy
 
-logger = Logger(__name__)
-simple_strategy = RetryStrategy(logger)
-fixed_delay_strategy = RetryWithFixedDelayStrategy(logger)
+simple_strategy = RetryStrategy()
+fixed_delay_strategy = RetryWithFixedDelayStrategy()
 
 
 class TestClass:
