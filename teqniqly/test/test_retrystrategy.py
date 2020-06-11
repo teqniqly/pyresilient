@@ -4,12 +4,12 @@ from unittest import TestCase
 from teqniqly.retry.strategies import (
     RetryStrategy,
     RetryWithFixedDelayStrategy,
-    RetryWithVariableDelay,
+    RetryWithVariableDelayStrategy,
 )
 
 simple_strategy = RetryStrategy()
 fixed_delay_strategy = RetryWithFixedDelayStrategy()
-variable_delay_strategy = RetryWithVariableDelay()
+variable_delay_strategy = RetryWithVariableDelayStrategy()
 
 delay_generator = (2 ** i for i in range(1, 100))
 

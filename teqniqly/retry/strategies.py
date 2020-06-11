@@ -5,6 +5,9 @@ from logging import Logger
 
 
 # noinspection PyBroadException
+from typing import Generator
+
+
 class RetryStrategyBase(ABC):
     @abstractmethod
     def __init__(self, logger: Logger = None):
@@ -50,9 +53,18 @@ class RetryStrategy(RetryStrategyBase):
         self._max_retries = None
 
     def pre_execute(self):
-        max_retries = int(self._retry_kwargs.get("max_retries"))
-        if max_retries < 1:
-            raise ValueError("max_retries must be at least 1.")
+        self._max_retries = self._retry_kwargs.get("max_retries")
+
+        if not self._max_retries:
+            raise ValueError("A max_retries value of at least 1 must be specified.")
+
+        if not isinstance(self._max_retries, int):
+            raise ValueError(
+                "The max_retries value must be an integer with a value of at least one."
+            )
+
+        if self._max_retries < 1:
+            raise ValueError("The max_retries value must be at least 1.")
 
     def post_retry(self):
         pass
@@ -64,10 +76,18 @@ class RetryWithFixedDelayStrategy(RetryStrategy):
         self._delay = None
 
     def pre_execute(self):
-        self._delay = int(self._retry_kwargs.get("delay"))
+        self._delay = self._retry_kwargs.get("delay")
+
+        if not self._delay:
+            raise ValueError("A delay value of at least 1 second must be specified.")
+
+        if not isinstance(self._delay, int):
+            raise ValueError(
+                "The delay value must be an integer with a value of at least one."
+            )
 
         if self._delay < 1:
-            raise ValueError("delay must be at least one second.")
+            raise ValueError("The delay value must be at least one second.")
 
         super().pre_execute()
 
@@ -76,7 +96,7 @@ class RetryWithFixedDelayStrategy(RetryStrategy):
         super().post_retry()
 
 
-class RetryWithVariableDelay(RetryStrategy):
+class RetryWithVariableDelayStrategy(RetryStrategy):
     def __init__(self, logger: Logger = None):
         super().__init__(logger)
         self._delay_generator = None
@@ -85,7 +105,10 @@ class RetryWithVariableDelay(RetryStrategy):
         self._delay_generator = self._retry_kwargs.get("delay_generator")
 
         if not self._delay_generator:
-            raise ValueError("delay_generator must be specified.")
+            raise ValueError("A delay_generator must be specified.")
+
+        if not isinstance(self._delay_generator, Generator):
+            raise ValueError("The delay_generator value must be a generator type.")
 
         super().pre_execute()
 
