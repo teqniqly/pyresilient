@@ -1,10 +1,17 @@
 import time
 from unittest import TestCase
 
-from teqniqly.retry.strategies import RetryStrategy, RetryWithFixedDelayStrategy
+from teqniqly.retry.strategies import (
+    RetryStrategy,
+    RetryWithFixedDelayStrategy,
+    RetryWithVariableDelay,
+)
 
 simple_strategy = RetryStrategy()
 fixed_delay_strategy = RetryWithFixedDelayStrategy()
+variable_delay_strategy = RetryWithVariableDelay()
+
+delay_generator = (2 ** i for i in range(1, 100))
 
 
 class TestClass:
@@ -28,6 +35,10 @@ class TestClass:
 
     @fixed_delay_strategy.retry(delay=2, max_retries=10)
     def execute_retry_with_delay(self, return_value: int = 0) -> int:
+        return self._execute(return_value)
+
+    @variable_delay_strategy.retry(max_retries=10, delay_generator=delay_generator)
+    def execute_retry_with_variable_delay(self, return_value: int = 0) -> int:
         return self._execute(return_value)
 
 
@@ -66,3 +77,19 @@ class RetryWithFixedDelayStrategy(TestCase):
         self.assertEqual(3, tc.retry_count)
         self.assertEqual(10, result)
         self.assertAlmostEqual(end_time, 6, places=2)
+
+
+class RetryWithVariableDelayStrategy(TestCase):
+    def test_retry_strategy(self):
+        # Arrange
+        tc = TestClass(3)
+
+        # Act
+        start_time = time.perf_counter()
+        result = tc.execute_retry_with_variable_delay(10)
+        end_time = time.perf_counter() - start_time
+
+        # Assert
+        self.assertEqual(3, tc.retry_count)
+        self.assertEqual(10, result)
+        self.assertAlmostEqual(end_time, 14, places=2)

@@ -77,4 +77,18 @@ class RetryWithFixedDelayStrategy(RetryStrategy):
 
 
 class RetryWithVariableDelay(RetryStrategy):
-    pass
+    def __init__(self, logger: Logger = None):
+        super().__init__(logger)
+        self._delay_generator = None
+
+    def pre_execute(self):
+        self._delay_generator = self._retry_kwargs.get("delay_generator")
+
+        if not self._delay_generator:
+            raise ValueError("delay_generator must be specified.")
+
+        super().pre_execute()
+
+    def post_retry(self):
+        time.sleep(next(self._delay_generator))
+        super().post_retry()
