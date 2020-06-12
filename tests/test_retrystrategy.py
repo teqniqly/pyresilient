@@ -17,42 +17,41 @@ variable_delay_strategy = RetryWithVariableDelayStrategy()
 delay_generator = (2 ** i for i in range(1, 100))
 
 
-class TestClass:
-    """
-    This class mimics a real-world class that will use the retry decorators.
-    """
-
-    def __init__(self, succeed_after_n_retries: int):
-        self._succeed_after_n_retries = succeed_after_n_retries
-        self.retry_count = 0
-
-    def _execute(self, return_value: int = 0) -> int:
-        try:
-            if self.retry_count < self._succeed_after_n_retries:
-                raise ValueError("Oops!")
-
-            return return_value
-        except:
-            self.retry_count += 1
-            raise
-
-    @simple_strategy.retry(max_retries=10)
-    def execute_retry_simple(self, return_value: int = 0) -> int:
-        return self._execute(return_value)
-
-    @fixed_delay_strategy.retry(delay=2, max_retries=10)
-    def execute_retry_with_delay(self, return_value: int = 0) -> int:
-        return self._execute(return_value)
-
-    @variable_delay_strategy.retry(max_retries=10, delay_generator=delay_generator)
-    def execute_retry_with_variable_delay(self, return_value: int = 0) -> int:
-        return self._execute(return_value)
-
-
 class RetryStrategyTests(TestCase):
+    class TestClass:
+        """
+        This class mimics a real-world class that will use the retry decorators.
+        """
+
+        def __init__(self, succeed_after_n_retries: int):
+            self._succeed_after_n_retries = succeed_after_n_retries
+            self.retry_count = 0
+
+        def _execute(self, return_value: int = 0) -> int:
+            try:
+                if self.retry_count < self._succeed_after_n_retries:
+                    raise ValueError("Oops!")
+
+                return return_value
+            except:
+                self.retry_count += 1
+                raise
+
+        @simple_strategy.retry(max_retries=10)
+        def execute_retry_simple(self, return_value: int = 0) -> int:
+            return self._execute(return_value)
+
+        @fixed_delay_strategy.retry(delay=2, max_retries=10)
+        def execute_retry_with_delay(self, return_value: int = 0) -> int:
+            return self._execute(return_value)
+
+        @variable_delay_strategy.retry(max_retries=10, delay_generator=delay_generator)
+        def execute_retry_with_variable_delay(self, return_value: int = 0) -> int:
+            return self._execute(return_value)
+
     def test_retry_strategy(self):
         # Arrange
-        tc = TestClass(3)
+        tc = RetryStrategyTests.TestClass(3)
 
         # Act
         result = tc.execute_retry_simple(10)
@@ -63,7 +62,7 @@ class RetryStrategyTests(TestCase):
 
     def test_when_retries_exhausted_raises_original_Exception(self):
         # Arrange
-        tc = TestClass(12)
+        tc = RetryStrategyTests.TestClass(12)
 
         # Act, Assert
         with self.assertRaises(ValueError):
@@ -73,7 +72,7 @@ class RetryStrategyTests(TestCase):
 class RetryWithFixedDelayStrategy(TestCase):
     def test_retry_strategy(self):
         # Arrange
-        tc = TestClass(3)
+        tc = RetryStrategyTests.TestClass(3)
 
         # Act
         start_time = time.perf_counter()
@@ -89,7 +88,7 @@ class RetryWithFixedDelayStrategy(TestCase):
 class RetryWithVariableDelayStrategy(TestCase):
     def test_retry_strategy(self):
         # Arrange
-        tc = TestClass(3)
+        tc = RetryStrategyTests.TestClass(3)
 
         # Act
         start_time = time.perf_counter()
