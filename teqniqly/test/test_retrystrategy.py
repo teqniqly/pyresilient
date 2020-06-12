@@ -1,3 +1,6 @@
+"""
+Tests for RetryStrategy derived classes.
+"""
 import time
 from unittest import TestCase
 
@@ -15,6 +18,10 @@ delay_generator = (2 ** i for i in range(1, 100))
 
 
 class TestClass:
+    """
+    This class mimics a real-world class that will use the retry decorators.
+    """
+
     def __init__(self, succeed_after_n_retries: int):
         self._succeed_after_n_retries = succeed_after_n_retries
         self.retry_count = 0
